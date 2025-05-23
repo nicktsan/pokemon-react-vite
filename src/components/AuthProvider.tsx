@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { AuthContext, type LoginData } from "../hooks/useAuth";
+import API_HOST_URL from "src/env";
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -11,7 +12,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
   const loginAction = async (data: LoginData) => {
     try {
-      const response = await fetch("http://localhost:8080/login", {
+      const response = await fetch(`${API_HOST_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

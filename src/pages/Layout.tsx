@@ -12,9 +12,6 @@ function Layout() {
           <li>
             <Link to="/search">Poke Search</Link>
           </li>
-          <li>
-            <Link to="/sendtokens">Send Tokens</Link>
-          </li>
         </ul>
         <LoginButton />
       </nav>

@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import API_HOST_URL from "../env";
 
 function SendTokens() {
     const { data: isAuthenticated, isLoading, error } = useQuery({
         queryFn: () =>
-            fetch(`http://localhost:8080/isAuthenticated`, {
+            fetch(`${API_HOST_URL}/isAuthenticated`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
