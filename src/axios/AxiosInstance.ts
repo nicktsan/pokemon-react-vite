@@ -46,13 +46,10 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log("originalRequest", originalRequest._retry); 
     // Prevent infinite loop by checking a custom _retry flag
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       try {
         originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
-        console.log("Refreshing token after updating originalRequest._retry...");
-        console.log(originalRequest._retry);
         const res = await axios.post(`${API_HOST_URL}/refreshToken`, {}, { withCredentials: true });
         let newToken = "";
         if (res.status !== 200) {

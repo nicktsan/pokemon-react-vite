@@ -14,7 +14,6 @@ const ProtectedRoute = ({ redirectPath = "/" }: ProtectedRouteProps) => {
   }
 
   if (!accessToken) {
-    console.log("Access token not found, redirecting");
     return <Navigate to={redirectPath} replace />;
   }
   return <Outlet />;
