@@ -13,11 +13,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    (async () => {
-      const newAccessToken = await refreshToken();  
-      setAccessToken(newAccessToken);
-      setAuthorizationHeader(newAccessToken);
-    })();
+      (async () => {
+        const newAccessToken = await refreshToken();
+        setAccessToken(newAccessToken);
+        setAuthorizationHeader(newAccessToken);
+      })();
   }, []);
 
   const loginAction = async (data: LoginData) => {

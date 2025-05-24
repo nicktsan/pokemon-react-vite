@@ -7,6 +7,8 @@ import Layout from './pages/Layout.tsx';
 import PokeSearch from './pages/PokeSearch.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AuthProvider from './components/AuthProvider.tsx';
+import ProtectedPage from './pages/ProtectedPage.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +28,9 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="search/:name?" element={<PokeSearch />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="protected" element={<ProtectedPage />} />
+              </Route>
             </Route>
           </Routes>
         </AuthProvider>

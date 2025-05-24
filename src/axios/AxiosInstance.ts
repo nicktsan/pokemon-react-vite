@@ -17,40 +17,58 @@ function setAuthorizationHeader(token: string) {
 }
 async function refreshToken() {
   const response = await axiosInstance.post(`${API_HOST_URL}/refreshToken`);
-  const data = response.data;
   let accessToken = "";
+  if (response.status !== 200) {
+    throw new Error("Failed to refresh token");
+  }
+  const data = response.data;
   if (data.access_token) {
     accessToken = data.access_token;
   }
   return accessToken;
 }
-// axiosInstance.interceptors.request.use(
-//     (config) => {
-//         const token = accessToken; // Get the access token from your state or context or session storage
-//         if (token) {
-//             config.headers.Authorization = `Bearer ${token}`;
-//         }
-//         return config;
-//     },
-//     (error) => {
-//         // Handle request error
-//         return Promise.reject(error);
-//     }
-// );
+axiosInstance.interceptors.request.use(
+    (config) => {
+        const token = axiosInstance.defaults.headers.common['Authorization'];
+        if (token) {
+            config.headers.Authorization = token;
+        }
+        return config;
+    },
+    (error) => {
+        // Handle request error
+        return Promise.reject(error);
+    }
+);
 
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response && error.response.status === 401) {
+    const originalRequest = error.config;
+    console.log("originalRequest", originalRequest._retry); 
+    // Prevent infinite loop by checking a custom _retry flag
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       try {
-        const newToken = await refreshToken();
-        axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-
-        const originalRequest = error.config;
+        originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
+        console.log("Refreshing token after updating originalRequest._retry...");
+        console.log(originalRequest._retry);
+        const res = await axios.post(`${API_HOST_URL}/refreshToken`, {}, { withCredentials: true });
+        let newToken = "";
+        if (res.status !== 200) {
+          throw new Error("Failed to refresh token");
+        }
+        const data = res.data;
+        if (data.access_token) {
+          newToken = data.access_token;
+        }
+        setAuthorizationHeader(newToken);
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-        return axios(originalRequest);
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
+        // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
+        console.error('Token refresh failed:', refreshError);
+        setAuthorizationHeader("");
         return Promise.reject(refreshError);
       }
     }
