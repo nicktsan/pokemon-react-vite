@@ -4,7 +4,6 @@ import { useAuth } from "../hooks/useAuth";
 function LoginButton() {
     const auth = useAuth();
     const handleLogin = () => {
-        console.log("Login button clicked");
         auth.loginAction({
             username: "username_string",
             password: "password_string"

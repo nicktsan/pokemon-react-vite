@@ -21,8 +21,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         credentials: "include",
       });
       const res = await response.json();
-      console.log("res");
-      console.log(res);
       if (res.access_token) {
         setAccessToken(res.access_token);
         navigate("/");
