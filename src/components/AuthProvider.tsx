@@ -10,6 +10,7 @@ interface AuthProviderProps {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [accessToken, setAccessToken] = useState("");
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +18,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         const newAccessToken = await refreshToken();
         setAccessToken(newAccessToken);
         setAuthorizationHeader(newAccessToken);
+        setLoading(false);
       })();
   }, []);
 
@@ -51,7 +53,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, loginAction, logOut }}>
+    <AuthContext.Provider value={{ accessToken, loginAction, logOut, loading }}>
       {children}
     </AuthContext.Provider>
   );

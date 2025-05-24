@@ -12,6 +12,9 @@ function Layout() {
           <li>
             <Link to="/search">Poke Search</Link>
           </li>
+          <li>
+            <Link to="/protected">Protected</Link>
+          </li>
         </ul>
         <LoginButton />
       </nav>

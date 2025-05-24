@@ -6,10 +6,14 @@ type ProtectedRouteProps = {
 };
 
 const ProtectedRoute = ({ redirectPath = "/" }: ProtectedRouteProps) => {
-  const auth = useAuth();
+  const { accessToken, loading } = useAuth();
 
-  if (!auth.accessToken) {
-    console.log(auth);
+  if (loading) {
+    // Show a loading indicator or nothing until auth loads
+    return <h1>Loading...</h1>;
+  }
+
+  if (!accessToken) {
     console.log("Access token not found, redirecting");
     return <Navigate to={redirectPath} replace />;
   }
