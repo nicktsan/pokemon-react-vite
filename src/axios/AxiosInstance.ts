@@ -1,26 +1,29 @@
 import axios from 'axios';
 import API_HOST_URL from 'src/env';
+
+const axiosInstance = axios.create({
+  baseURL: API_HOST_URL
+});
+
+// Configure axios to include cookies with each request
+axiosInstance.defaults.withCredentials = true;
+
+function setAuthorizationHeader(token: string) {
+  if (token) {
+    axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common['Authorization'];
+  }
+}
 async function refreshToken() {
-  const response = await fetch(`${API_HOST_URL}/refreshToken`, {
-    method: 'POST',
-    credentials: 'include',
-  });
-  const data = await response.json();
+  const response = await axiosInstance.post(`${API_HOST_URL}/refreshToken`);
+  const data = response.data;
   let accessToken = "";
   if (data.access_token) {
     accessToken = data.access_token;
   }
   return accessToken;
 }
-
-const axiosInstance = axios.create({
-  baseURL: API_HOST_URL,
-});
-
-// Configure axios to include cookies with each request
-axiosInstance.defaults.withCredentials = true;
-
-
 // axiosInstance.interceptors.request.use(
 //     (config) => {
 //         const token = accessToken; // Get the access token from your state or context or session storage
@@ -54,4 +57,4 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 )
-export { axiosInstance, refreshToken };
+export { axiosInstance, refreshToken, setAuthorizationHeader };

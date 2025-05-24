@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { AuthContext, type LoginData } from "../hooks/useAuth";
 import API_HOST_URL from "src/env";
-import { refreshToken } from "src/axios/AxiosInstance";
+import { axiosInstance, refreshToken, setAuthorizationHeader } from "src/axios/AxiosInstance";
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -14,44 +14,34 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     (async () => {
-        setAccessToken(await refreshToken());
+      const newAccessToken = await refreshToken();  
+      setAccessToken(newAccessToken);
+      setAuthorizationHeader(newAccessToken);
     })();
   }, []);
 
   const loginAction = async (data: LoginData) => {
     try {
-      const response = await fetch(`${API_HOST_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      const res = await response.json();
-      if (res.access_token) {
-        setAccessToken(res.access_token);
+      const response = await axiosInstance.post(`${API_HOST_URL}/login`, data);
+      if (response.data.access_token) {
+        setAccessToken(response.data.access_token);
+        setAuthorizationHeader(response.data.access_token);
         navigate("/");
         return;
       }
-      throw new Error(res.message);
     } catch (err) {
       console.error(err);
       setAccessToken("");
+      setAuthorizationHeader("");
     }
   };
 
   const logOut = async () => {
     try {
-      const response = await fetch(`${API_HOST_URL}/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-      if (response.ok) {
+      const response = await axiosInstance.post(`${API_HOST_URL}/logout`);
+      if (response.status === 200) {
         setAccessToken("");
+        setAuthorizationHeader("");
         navigate("/");
         return;
       }
